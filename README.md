@@ -20,11 +20,7 @@ You can use JAF as an application with interative UI or just consume it's python
 ### Python API
 To use JAF's python apis you can run following command to install JAF as python package
 ```
-   $ TODO: Add Install Command
-```
-To install a specific version, you need to specific version
-```
-   $ TODO: Add Install Command
+   $ pip3 install git+https://github.com/juspay/JAF.git
 ```
 
 

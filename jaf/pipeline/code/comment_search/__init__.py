@@ -1,0 +1,1 @@
+from jaf.pipeline.code.comment_search.base import CommentSearchPipeline

@@ -1,0 +1,25 @@
+[build-system]
+requires = [ "poetry-core",]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "jaf"
+version = "0.1.6.4"
+description = "Juspay AI Framework"
+authors = [ "Junaid <junaid.shaikh@juspay.in>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+openai = "^1.35.14"
+qdrant-client = "^1.9.1"
+tiktoken = "^0.7.0"
+tree-sitter = "<0.22"
+tree-sitter-languages = "^1.10.2"
+boto3 = "^1.35.81"
+
+[tool.poetry.group.dev.dependencies]
+toml = "^0.10.2"
+scipy = "^1.14.1"
+scikit-learn = "^1.5.1"
+ijson = "^3.3.0"

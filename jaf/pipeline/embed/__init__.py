@@ -1,0 +1,1 @@
+from jaf.pipeline.embed.base import IndexPipeEnum, IndexPipeline

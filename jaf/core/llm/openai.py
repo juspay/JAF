@@ -1,6 +1,6 @@
 import json
 from typing import List, Dict, Optional
-from openai import AzureOpenAI
+from openai import AzureOpenAI, OpenAI
 from openai.types.chat import ChatCompletion
 
 from jaf.core.llm.base import LLMBase
@@ -10,24 +10,13 @@ from jaf.logger import init_logger
 
 logger = init_logger(__name__)
 
-class AzureGPTLLM(LLMBase):
-    def __init__(self, deployment_name=None, api_base=None, api_version=None, api_key=None, stream=False, max_tokens=1000, functions: List[LLMCallableFunction] = []) -> None:
-        self.deployment_name = deployment_name
-        self.api_base = api_base
-        self.api_version = api_version
-        self.api_key = api_key
+class OpenAIBase(LLMBase):
+    def __init__(self, model_name = None, stream=False, max_tokens=1000, functions: List[LLMCallableFunction] = []) -> None:
         self.max_tokens = max_tokens
         self.function_list = functions
         self.available_functions_dict = {func.name: func for func in self.function_list}
-
-        self.client = AzureOpenAI(
-            azure_endpoint=self.api_base,
-            azure_deployment=self.deployment_name,
-            api_version=self.api_version,
-            api_key=self.api_key,
-            http_client=get_network_proxy(__name__)
-        )
-
+        self.model_name = model_name
+        self.client = None
         super().__init__(stream=stream)
 
     def create_role_payload(self, role, content):
@@ -113,7 +102,7 @@ class AzureGPTLLM(LLMBase):
 
         response = self.client.chat.completions.create(
                 **chat_payload,
-                model=self.deployment_name,
+                model=self.model_name,
                 stream=stream,
                 response_format= { "type": response_format } if response_format else None
         )
@@ -125,3 +114,40 @@ class AzureGPTLLM(LLMBase):
             **generation_config
         }
         return chat_payload
+
+
+class OpenAILLM(OpenAIBase):
+    def __init__(self, model_name= None, base_url=None, api_key=None, stream=False, max_tokens=1000, functions: List[LLMCallableFunction] = []) -> None:
+        super().__init__(model_name, stream=stream, max_tokens=max_tokens, functions=functions)
+
+        self.base_url = base_url
+        self.api_key = api_key
+        self.max_tokens = max_tokens
+        self.function_list = functions
+
+        self.client = OpenAI(
+            base_url=self.base_url,
+            api_key=self.api_key,
+            http_client=get_network_proxy(__name__)
+        )
+
+
+class AzureGPTLLM(OpenAIBase):
+    def __init__(self, deployment_name=None, api_base=None, api_version=None, api_key=None, stream=False, max_tokens=1000, functions: List[LLMCallableFunction] = []) -> None:
+        super().__init__(model_name=deployment_name, stream=stream, max_tokens=max_tokens, functions=functions)
+
+        self.deployment_name = deployment_name
+        self.api_base = api_base
+        self.api_version = api_version
+        self.api_key = api_key
+        self.max_tokens = max_tokens
+        self.function_list = functions
+
+        self.client = AzureOpenAI(
+            azure_endpoint=self.api_base,
+            azure_deployment=self.deployment_name,
+            api_version=self.api_version,
+            api_key=self.api_key,
+            http_client=get_network_proxy(__name__)
+        )
+
